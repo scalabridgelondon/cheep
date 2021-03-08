@@ -1,12 +1,12 @@
 name := "cheep"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
-ThisBuild / scalaVersion := "2.13.4"
+ThisBuild / scalaVersion := "2.13.5"
 ThisBuild / useSuperShell := false
 
 val catsVersion = "2.4.2"
 val circeVersion = "0.13.0"
-val http4sVersion = "1.0.0-M16"
+val http4sVersion = "1.0.0-M6"
 val logbackVersion = "1.2.3"
 
 val sharedSettings = Seq(
