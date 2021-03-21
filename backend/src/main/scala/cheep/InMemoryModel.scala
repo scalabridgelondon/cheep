@@ -1,0 +1,28 @@
+package cheep
+
+import cheep.data._
+import scala.collection.concurrent
+
+object InMemoryModel extends Model {
+  val currentId = new java.util.concurrent.atomic.AtomicInteger()
+  val postStore = concurrent.TrieMap.empty[Id, Post]
+
+  def nextId(): Id = {
+    val id = currentId.getAndIncrement()
+    Id(id)
+  }
+
+  /** Get all the posts */
+  def posts: Posts = {
+    val sortedPosts: Iterable[(Id, Post)] =
+      postStore.toArray.sortInPlaceBy{ case (id, _) => id }.toIterable
+    Posts(sortedPosts)
+  }
+
+  /** Create a new post */
+  def create(post: Post): Id = {
+    val id = nextId()
+    postStore.addOne(id -> post)
+    id
+  }
+}

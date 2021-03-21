@@ -8,6 +8,7 @@ val catsVersion = "2.4.2"
 val circeVersion = "0.13.0"
 val http4sVersion = "1.0.0-M6"
 val logbackVersion = "1.2.3"
+val munitVersion = "0.7.22"
 
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
@@ -15,7 +16,7 @@ val sharedSettings = Seq(
     "io.circe"      %%% "circe-core"    % circeVersion,
     "io.circe"      %%% "circe-generic" % circeVersion,
     "io.circe"      %%% "circe-parser"  % circeVersion,
-    "org.scalameta" %%% "munit"         % "0.7.22" % Test
+    "org.scalameta" %%% "munit"         % munitVersion % Test
   ),
   scalacOptions ++= Seq(
     "-Ymacro-annotations",
