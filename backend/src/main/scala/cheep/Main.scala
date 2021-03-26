@@ -5,13 +5,12 @@ import cats.implicits._
 import fs2.Stream
 import org.http4s._
 import org.http4s.ember.server.EmberServerBuilder
-import org.http4s.server.{Router, Server}
-import org.http4s.server.middleware.CORS
 import org.http4s.implicits._
+import org.http4s.server.middleware.CORS
+import org.http4s.server.{Router, Server}
 
-/**
- * This object setups and runs the webserver.
- */
+/** This object setups and runs the webserver.
+  */
 object Main extends IOApp {
   private def app(blocker: Blocker): HttpApp[IO] = {
     val services =

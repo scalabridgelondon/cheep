@@ -1,7 +1,8 @@
 package cheep
 
-import cheep.data._
 import scala.collection.concurrent
+
+import cheep.data._
 
 object InMemoryModel extends Model {
   val currentId = new java.util.concurrent.atomic.AtomicInteger()
@@ -15,7 +16,7 @@ object InMemoryModel extends Model {
   /** Get all the posts */
   def posts: Posts = {
     val sortedPosts: Iterable[(Id, Post)] =
-      postStore.toArray.sortInPlaceBy{ case (id, _) => id }.toIterable
+      postStore.toArray.sortInPlaceBy { case (id, _) => id }.toIterable
     Posts(sortedPosts)
   }
 
