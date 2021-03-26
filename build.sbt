@@ -30,10 +30,16 @@ val sharedSettings = Seq(
   addCompilerPlugin(scalafixSemanticdb)
 )
 
+val deploy = taskKey[Unit]("Deploy the frontend to the backend asset location")
+val build = taskKey[Unit]("Format, compile, and test")
+
 lazy val data = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("data"))
-  .settings(sharedSettings)
+  .settings(
+    sharedSettings,
+    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
+  )
 
 lazy val backend = project
   .in(file("backend"))
@@ -46,11 +52,11 @@ lazy val backend = project
       "ch.qos.logback" %  "logback-classic" % logbackVersion,
       ),
     run / fork := true,
-    run / javaOptions += s"-Dtodone.assets=${((baseDirectory.value) / "assets").toString}"
+    run / javaOptions += s"-Dtodone.assets=${((baseDirectory.value) / "assets").toString}",
+    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
   )
   .dependsOn(data.jvm)
 
-val deploy = taskKey[Unit]("Build and deploy the frontend to the backend asset location")
 
 lazy val frontend = project
   .in(file("frontend"))
@@ -88,17 +94,19 @@ lazy val frontend = project
     fullOptJS / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-opt.config.js"),
     Test / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-core.config.js"),
     Test / requireJsDomEnv := true,
+    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test, Compile / fullOptJS, deploy).value },
     deploy := {
       val fs = (Compile / fullOptJS / webpack).value
       val outDir = (backend / baseDirectory).value / "assets"
 
-      fs.foreach(f =>
-        sbt.io.IO.copyFile(f.data, outDir / (f.data.name))
-      )
+      fs.foreach { f =>
+        val input = f.data
+        val output = outDir / (f.data.name)
+        println(s"Deploying $input to $output")
+        sbt.io.IO.copyFile(input, output)}
     }
   )
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(data.js)
 
 addCommandAlias("dev", ";fastOptJS::startWebpackDevServer;~fastOptJS")
-addCommandAlias("build", "fullOptJS::webpack")

@@ -6,3 +6,4 @@
 metals.sbt
 target
 project/project
+frontend/build
