@@ -13,6 +13,6 @@ import org.http4s.server.staticcontent._
 object AssetService {
   val assetDirectory = Properties.propOrElse("cheep.assets", "./assets/")
 
-  def service(blocker: Blocker)(implicit cs: ContextShift[IO]): HttpRoutes[IO] =
-    fileService(FileService.Config(assetDirectory, blocker))
+  def service(): HttpRoutes[IO] =
+    fileService(FileService.Config(assetDirectory))
 }
