@@ -9,7 +9,7 @@ ThisBuild / useSuperShell := false
 
 val catsVersion = "2.6.1"
 val circeVersion = "0.14.1"
-val http4sVersion = "1.0.0-M29"
+val http4sVersion = "0.23.6"
 val logbackVersion = "1.2.3"
 val munitVersion = "1.0.0-M1"
 
