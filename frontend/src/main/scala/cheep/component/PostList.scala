@@ -1,12 +1,10 @@
 package cheep.component
 
-import slinky.core._
-import slinky.core.annotations.react
-import slinky.web.html._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
-@react object PostList {
+object PostList {
   type Props = Unit
-  val component = FunctionalComponent[Props] { _ =>
-    p("post list goes here")
-  }
+  val component = ScalaComponent
+    .static(<.p("Post list goes here"))
 }

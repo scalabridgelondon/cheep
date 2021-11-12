@@ -1,12 +1,9 @@
 package cheep.component
 
-import slinky.core._
-import slinky.core.annotations.react
-import slinky.web.html._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
-@react object PostEditor {
+object PostEditor {
   type Props = Unit
-  val component = FunctionalComponent[Props] { _ =>
-    p("post editor goes here")
-  }
+  val component = ScalaComponent.static(<.p("Post editor goes here"))
 }

@@ -5,21 +5,24 @@ ThisBuild / scalaVersion := "3.1.0"
 ThisBuild / useSuperShell := false
 
 // ScalaFix configuration
-// ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
 val catsVersion = "2.6.1"
 val circeVersion = "0.14.1"
 val http4sVersion = "0.23.6"
 val logbackVersion = "1.2.3"
 val munitVersion = "1.0.0-M1"
+val scalajsReactVersion = "2.0.0"
 
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"     % catsVersion,
-    "io.circe"      %%% "circe-core"    % circeVersion,
-    "io.circe"      %%% "circe-generic" % circeVersion,
-    "io.circe"      %%% "circe-parser"  % circeVersion,
-    "org.scalameta" %%% "munit"         % munitVersion % Test
+    "org.typelevel" %%% "cats-core" % catsVersion,
+    "io.circe" %%% "circe-core" % circeVersion,
+    "io.circe" %%% "circe-generic" % circeVersion,
+    "io.circe" %%% "circe-parser" % circeVersion,
+    "org.scalameta" %%% "munit" % munitVersion % Test
   ),
   // scalacOptions ++= Seq(
   //   "-Yrangepos",
@@ -27,7 +30,7 @@ val sharedSettings = Seq(
   //   "-Wunused:imports",
   //   "-Werror"
   // ),
-  testFrameworks += new TestFramework("munit.Framework"),
+  testFrameworks += new TestFramework("munit.Framework")
   // addCompilerPlugin(scalafixSemanticdb)
 )
 
@@ -39,7 +42,9 @@ lazy val data = crossProject(JSPlatform, JVMPlatform)
   .in(file("data"))
   .settings(
     sharedSettings,
-    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
+    build := {
+      Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value
+    }
   )
 
 lazy val backend = project
@@ -50,22 +55,23 @@ lazy val backend = project
       "org.http4s" %% "http4s-ember-server" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
       "org.http4s" %% "http4s-dsl" % http4sVersion,
-      "ch.qos.logback" %  "logback-classic" % logbackVersion,
-      ),
+      "ch.qos.logback" % "logback-classic" % logbackVersion
+    ),
     run / fork := true,
     run / javaOptions += s"-Dtodone.assets=${((baseDirectory.value) / "assets").toString}",
-    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
+    build := {
+      Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value
+    }
   )
   .dependsOn(data.jvm)
-
 
 lazy val frontend = project
   .in(file("frontend"))
   .settings(
     sharedSettings,
     Compile / npmDependencies ++= Seq(
-      "react" -> "16.13.1",
-      "react-dom" -> "16.13.1",
+      "react" -> "17.0.2",
+      "react-dom" -> "17.0.2",
       "react-proxy" -> "1.1.8"
     ),
     Compile / npmDevDependencies ++= Seq(
@@ -82,20 +88,37 @@ lazy val frontend = project
       "react-icons" -> "4.1.0"
     ),
     libraryDependencies ++= Seq(
-      "me.shadaj" %%% "slinky-web" % "0.6.8+6-998383e1",
-      "me.shadaj" %%% "slinky-hot" % "0.6.8+6-998383e1",
+      "com.github.japgolly.scalajs-react" %%% "core-ext-cats" % scalajsReactVersion,
+      "com.github.japgolly.scalajs-react" %%% "core-ext-cats_effect" % scalajsReactVersion,
+      "com.github.japgolly.scalajs-react" %%% "core" % scalajsReactVersion,
       "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     ),
     webpack / version := "4.43.0",
     startWebpackDevServer / version := "3.11.0",
     webpackResources := baseDirectory.value / "webpack" * "*",
-    fastOptJS / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-fastopt.config.js"),
+    fastOptJS / webpackConfigFile := Some(
+      baseDirectory.value / "webpack" / "webpack-fastopt.config.js"
+    ),
     fastOptJS / webpackDevServerExtraArgs := Seq("--inline", "--hot"),
     fastOptJS / webpackBundlingMode := BundlingMode.LibraryOnly(),
-    fullOptJS / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-opt.config.js"),
-    Test / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-core.config.js"),
+    fullOptJS / webpackConfigFile := Some(
+      baseDirectory.value / "webpack" / "webpack-opt.config.js"
+    ),
+    Test / webpackConfigFile := Some(
+      baseDirectory.value / "webpack" / "webpack-core.config.js"
+    ),
     Test / requireJsDomEnv := true,
-    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test, Compile / fullOptJS, deploy).value },
+    build := {
+      Def
+        .sequential(
+          scalafixAll.toTask(""),
+          scalafmtAll,
+          Test / test,
+          Compile / fullOptJS,
+          deploy
+        )
+        .value
+    },
     deploy := {
       val fs = (Compile / fullOptJS / webpack).value
       val outDir = (backend / baseDirectory).value / "assets"
@@ -104,10 +127,14 @@ lazy val frontend = project
         val input = f.data
         val output = outDir / (f.data.name)
         println(s"Deploying $input to $output")
-        sbt.io.IO.copyFile(input, output)}
+        sbt.io.IO.copyFile(input, output)
+      }
     }
   )
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(data.js)
 
-addCommandAlias("dev", ";fastOptJS::startWebpackDevServer;~fastOptJS")
+addCommandAlias(
+  "dev",
+  ";frontend / Compile / fastOptJS / startWebpackDevServer;~fastOptJS"
+)
