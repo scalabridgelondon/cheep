@@ -4,6 +4,7 @@ import cheep.component._
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import cheep.data.Posts
 
 object App {
   type Props = Unit
@@ -12,7 +13,7 @@ object App {
       <.h1(^.className := "text-4xl font-extrabold")("Cheep!"),
       <.h2(^.className := "text-2xl")("Microblogging on the cheap"),
       PostEditor.component(),
-      PostList.component()
+      PostList.component(Posts.empty)
     )
   }
 }
