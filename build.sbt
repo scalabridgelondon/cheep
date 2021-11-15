@@ -5,9 +5,8 @@ ThisBuild / scalaVersion := "3.1.0"
 ThisBuild / useSuperShell := false
 
 // ScalaFix configuration
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 ThisBuild / semanticdbEnabled := true
-ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 
 val catsVersion = "2.6.1"
 val circeVersion = "0.14.1"
@@ -31,7 +30,6 @@ val sharedSettings = Seq(
   //   "-Werror"
   // ),
   testFrameworks += new TestFramework("munit.Framework")
-  // addCompilerPlugin(scalafixSemanticdb)
 )
 
 val deploy = taskKey[Unit]("Deploy the frontend to the backend asset location")
