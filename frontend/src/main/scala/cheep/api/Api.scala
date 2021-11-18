@@ -1,18 +1,13 @@
 package cheep.api
 
-import io.circe.{Decoder, Json}
+import scala.concurrent.Future
+
+import cheep.data._
+
 import io.circe.parser.parse
 import io.circe.syntax._
-import scala.concurrent.Future
-import org.scalajs.dom.{
-  Fetch,
-  Headers,
-  HttpMethod,
-  Request,
-  RequestInit,
-  RequestMode
-}
-import cheep.data._
+import io.circe.{Decoder, Json}
+import org.scalajs.dom._
 
 object Api {
   implicit val ec: scala.concurrent.ExecutionContext =
