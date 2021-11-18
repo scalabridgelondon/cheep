@@ -4,16 +4,33 @@ import cheep.component._
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import cheep.data.Posts
+import cheep.data._
 
 object App {
-  type Props = Unit
-  val component = ScalaComponent.static {
-    <.div(^.className := "container mx-auto py-4")(
-      <.h1(^.className := "text-4xl font-extrabold")("Cheep!"),
-      <.h2(^.className := "text-2xl")("Microblogging on the cheap"),
-      PostEditor.component(),
-      PostList.component(Posts.empty)
-    )
+  final class Backend($ : BackendScope[Unit, Posts]) {
+    def render(state: Posts): VdomElement = {
+      <.div(^.className := "container mx-auto py-4")(
+        <.h1(^.className := "text-4xl font-extrabold")("Cheep!"),
+        <.h2(^.className := "text-2xl")("Microblogging on the cheap"),
+        PostList.component(state),
+        PostEditor.component()
+      )
+    }
   }
+  val component = ScalaComponent
+    .builder[Unit]
+    .initialState(
+      Posts(
+        List(
+          Id(2) -> Post("BizzBuzz", "When's lunch? I'm sooooo hungry"),
+          Id(1) -> Post(
+            "Dreamer",
+            "The clouds are so beautiful today. It's a good day to be alive!"
+          ),
+          Id(0) -> Post("BizzBuzz", "Learning http4s today!")
+        )
+      )
+    )
+    .renderBackend[Backend]
+    .build
 }

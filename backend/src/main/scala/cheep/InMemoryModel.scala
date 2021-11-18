@@ -15,8 +15,8 @@ object InMemoryModel extends Model {
 
   /** Get all the posts */
   def posts: Posts = {
-    val sortedPosts: Iterable[(Id, Post)] =
-      postStore.toArray.sortInPlaceBy { case (id, _) => id }.toIterable
+    val sortedPosts: Seq[(Id, Post)] =
+      postStore.toArray.sortInPlaceBy { case (id, _) => id }.toSeq
     Posts(sortedPosts)
   }
 

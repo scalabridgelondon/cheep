@@ -6,11 +6,12 @@ import cheep.data.Posts
 
 object PostList {
   type Props = Posts
+
   val component = ScalaComponent
     .builder[Props]
     .render_P(posts =>
       <.div(
-        posts.posts.toVdomArray { case (id, post) => <.p(post.body) }
+        posts.posts.toVdomArray { case (id, post) => <.p(post.text) }
       )
     )
     .build
