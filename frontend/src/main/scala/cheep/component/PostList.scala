@@ -18,7 +18,7 @@ object PostList {
     val hue = string.hashCode() % 360
 
     js.Dictionary(
-      "color" -> (s"rgb($hue, 0.7, 0.7)")
+      "color" -> (s"hsl($hue, 70%, 70%)")
     )
   }
 
