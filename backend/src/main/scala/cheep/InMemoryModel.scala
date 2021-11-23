@@ -17,7 +17,7 @@ object InMemoryModel extends Model {
   def posts: Posts = {
     val sortedPosts: Seq[(Id, Post)] =
       postStore.toArray.sortInPlaceBy { case (id, _) => id }.toSeq
-    Posts(sortedPosts)
+    Posts(sortedPosts.toList)
   }
 
   /** Create a new post */

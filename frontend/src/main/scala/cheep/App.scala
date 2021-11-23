@@ -5,10 +5,27 @@ import cheep.data._
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import japgolly.scalajs.react.extra.StateSnapshot
+import japgolly.scalajs.react.ReactMonocle._
+import monocle.Lens
 
 object App {
-  final class Backend($ : BackendScope[Unit, Posts]) {
-    def render(state: Posts): VdomElement = {
+  final case class State(posts: Posts, newPost: Editable[Post])
+  object State {
+    import cheep.DataReusability._
+    implicit val stateReusability = Reusability.derive[State]
+
+    val newPost =
+      Lens[State, Editable[Post]](_.newPost)(np => s => s.copy(newPost = np))
+  }
+
+  final class Backend($ : BackendScope[Unit, State]) {
+    val stateSnapshot = StateSnapshot.withReuse.prepareVia($)
+
+    def render(state: State): VdomElement = {
+      val foo: StateSnapshot[Editable[Post]] =
+        stateSnapshot(state).zoomStateL(State.newPost)
+
       <.div(^.className := "container mx-auto py-4")(
         <.div(^.className := "pb-8")(
           <.h1(^.className := "text-4xl font-extrabold")(
@@ -34,35 +51,38 @@ object App {
             )
           )
         ),
-        PostList.component(state),
-        PostEditor.component()
+        PostList.component(state.posts),
+        PostEditor.component(foo)
       )
     }
   }
   val component = ScalaComponent
     .builder[Unit]
     .initialState(
-      Posts(
-        List(
-          Id(5) -> Post(
-            "Camus",
-            "In the midst of winter, I found there was, within me, an invincible summer."
-          ),
-          Id(4) -> Post("BizzBuzz", "When's lunch? I'm sooooo hungry"),
-          Id(3) -> Post(
-            "Archimedes",
-            "Give me a lever and a place to stand, and I will move the world!"
-          ),
-          Id(2) -> Post(
-            "Dreamer",
-            "The clouds are so beautiful today. It's a good day to be alive!"
-          ),
-          Id(1) -> Post("BizzBuzz", "Learning http4s today!"),
-          Id(0) -> Post(
-            "Ada",
-            "That brain of mine is something more than merely mortal, as time will show."
+      State(
+        Posts(
+          List(
+            Id(5) -> Post(
+              "Albert",
+              "In the midst of winter, I found there was, within me, an invincible summer."
+            ),
+            Id(4) -> Post("BizzBuzz", "When's lunch? I'm sooooo hungry"),
+            Id(3) -> Post(
+              "Archimedes",
+              "Give me a lever and a place to stand, and I will move the world!"
+            ),
+            Id(2) -> Post(
+              "Dreamer",
+              "The clouds are so beautiful today. It's a good day to be alive!"
+            ),
+            Id(1) -> Post("BizzBuzz", "Learning http4s today!"),
+            Id(0) -> Post(
+              "Ada",
+              "That brain of mine is something more than merely mortal, as time will show."
+            )
           )
-        )
+        ),
+        Editable.empty
       )
     )
     .renderBackend[Backend]
