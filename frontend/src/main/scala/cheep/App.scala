@@ -27,7 +27,7 @@ object App {
         stateSnapshot(state).zoomStateL(State.newPost)
 
       <.div(^.className := "container mx-auto py-4")(
-        <.div(^.className := "pb-8")(
+        <.div(^.className := "pb-6")(
           <.h1(^.className := "text-4xl font-extrabold")(
             "Cheep!",
             <.span(^.className := "pl-2 text-2xl text-gray-500")(

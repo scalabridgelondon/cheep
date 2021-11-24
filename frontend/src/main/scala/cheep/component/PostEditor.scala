@@ -26,14 +26,28 @@ object PostEditor {
       .prepareViaProps($)((props: Props) => props)
 
     def render(props: Props): VdomElement = {
-      <.h3("Say something. Let the world know.")(
-        StringEditor.component(authorSnapshot(props.value)),
+      <.div(^.className := "py-4")(
+        <.h3(^.className := "text-2xl font-extrabold pb-2")(
+          "Say something. Let the world know."
+        ),
+        StringEditor.component(
+          StringEditor.Props(
+            name = "author",
+            label = "Author",
+            string = authorSnapshot(props.value)
+          )
+        ),
         TextAreaEditor.component(
           TextAreaEditor.Props(
+            name = "content",
+            label = "Post",
             rows = 5,
             cols = 80,
             text = textSnapshot(props.value)
           )
+        ),
+        SubmitButton.component(
+          SubmitButton.Props(label = "Post it!", active = false)
         )
       )
     }
