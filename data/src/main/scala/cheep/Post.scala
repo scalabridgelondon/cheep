@@ -11,4 +11,6 @@ object Post {
 
   val author = Lens[Post, String](_.author)(a => _.copy(author = a))
   val text = Lens[Post, String](_.text)(t => _.copy(text = t))
+
+  def empty: Post = Post("", "")
 }

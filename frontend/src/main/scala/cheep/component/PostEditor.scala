@@ -7,8 +7,11 @@ import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react.extra.StateSnapshot
 import japgolly.scalajs.react.ReactMonocle._
 import monocle._
+import japgolly.scalajs.react.callback.Callback
 
 object PostEditor {
+  import Editable._
+
   type Props = StateSnapshot[Editable[Post]]
 
   val postLens: Lens[Editable[Post], Post] = Editable.lens(Post("", ""))
@@ -26,6 +29,18 @@ object PostEditor {
       .prepareViaProps($)((props: Props) => props)
 
     def render(props: Props): VdomElement = {
+      def postIsValid(post: Post): Boolean =
+        post.author.nonEmpty && post.text.nonEmpty
+
+      def onSubmit: Callback =
+        Callback {
+          props.value match {
+            case Finished(post) => ()
+            case d @ Draft(post) =>
+              if (postIsValid(post)) props.setState(d.finish) else ()
+          }
+        }
+
       <.div(^.className := "py-4")(
         <.h3(^.className := "text-2xl font-extrabold pb-2")(
           "Say something. Let the world know."

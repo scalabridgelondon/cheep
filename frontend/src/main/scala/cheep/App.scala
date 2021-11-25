@@ -82,7 +82,7 @@ object App {
             )
           )
         ),
-        Editable.empty
+        Editable.draft(Post.empty)
       )
     )
     .renderBackend[Backend]
