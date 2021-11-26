@@ -5,10 +5,11 @@ import scala.scalajs.js
 import cheep.data.Posts
 
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.StateSnapshot
 import japgolly.scalajs.react.vdom.html_<^._
 
 object PostList {
-  type Props = Posts
+  type Props = StateSnapshot[Posts]
 
   // Convert a String to CSS HSL string, where the color is chosen based on the
   // content of the input String.
@@ -30,7 +31,7 @@ object PostList {
   val component = ScalaComponent
     .builder[Props]
     .render_P(posts =>
-      posts.posts.toVdomArray { case (id, post) =>
+      posts.value.posts.toVdomArray { case (id, post) =>
         val hsl = stringToHsl(post.author)
         <.div(
           ^.className := "my-4 pl-2 rounded border-l-4",

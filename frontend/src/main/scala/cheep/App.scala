@@ -3,31 +3,40 @@ package cheep
 import cheep.component._
 import cheep.data._
 
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
-import japgolly.scalajs.react.extra.StateSnapshot
+import cats.effect.SyncIO
 import japgolly.scalajs.react.ReactMonocle._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.StateSnapshot
+import japgolly.scalajs.react.vdom.html_<^._
 import monocle.Lens
 
 object App {
-  final case class State(posts: Posts, newPost: Editable[Post])
+  final case class State(posts: Posts, newPost: Post)
   object State {
     import cheep.DataReusability._
     implicit val stateReusability = Reusability.derive[State]
 
+    val posts = Lens[State, Posts](_.posts)(ps => s => s.copy(posts = ps))
     val newPost =
-      Lens[State, Editable[Post]](_.newPost)(np => s => s.copy(newPost = np))
+      Lens[State, Post](_.newPost)(np => s => s.copy(newPost = np))
   }
 
   final class Backend($ : BackendScope[Unit, State]) {
-    val stateSnapshot = StateSnapshot.withReuse.prepareVia($)
-
     def render(state: State): VdomElement = {
-      val foo: StateSnapshot[Editable[Post]] =
-        stateSnapshot(state).zoomStateL(State.newPost)
+      val postsSnapshot: StateSnapshot[Posts] =
+        StateSnapshot.zoomL(State.posts)(state).setStateVia($)
 
-      <.div(^.className := "container mx-auto py-4")(
-        <.div(^.className := "pb-6")(
+      val newPostSnapshot: StateSnapshot[Post] =
+        StateSnapshot.zoomL(State.newPost)(state).setStateVia($)
+
+      def onPost(post: Post): SyncIO[Unit] = {
+        postsSnapshot.modState(_.add(post))
+      }
+
+      println(s"State is $state")
+
+      <.div(^.className := "container mx-auto p-4")(
+        <.div(^.className := "mb-6 p-4 rounded bg-white")(
           <.h1(^.className := "text-4xl font-extrabold")(
             "Cheep!",
             <.span(^.className := "pl-2 text-2xl text-gray-500")(
@@ -51,8 +60,14 @@ object App {
             )
           )
         ),
-        PostList.component(state.posts),
-        PostEditor.component(foo)
+        <.div(^.className := "mb-4 p-4 rounded bg-white")(
+          PostList.component(postsSnapshot)
+        ),
+        <.div(^.className := "mb-4 p-4 rounded bg-white")(
+          PostEditor.component(
+            PostEditor.Props(newPostSnapshot, onPost)
+          )
+        )
       )
     }
   }
@@ -82,7 +97,7 @@ object App {
             )
           )
         ),
-        Editable.draft(Post.empty)
+        Post.empty
       )
     )
     .renderBackend[Backend]

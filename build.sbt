@@ -88,9 +88,6 @@ lazy val frontend = project
       "react-icons" -> "4.1.0"
     ),
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "callback" % scalajsReactVersion,
-      "com.github.japgolly.scalajs-react" %%% "callback-ext-cats" % scalajsReactVersion,
-      "com.github.japgolly.scalajs-react" %%% "callback-ext-cats_effect" % scalajsReactVersion,
       "com.github.japgolly.scalajs-react" %%% "core-bundle-cats_effect" % scalajsReactVersion,
       "com.github.japgolly.scalajs-react" %%% "extra" % scalajsReactVersion,
       "com.github.japgolly.scalajs-react" %%% "extra-ext-monocle3" % scalajsReactVersion,

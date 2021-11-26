@@ -1,45 +1,36 @@
 package cheep.component
 
-import cheep.Editable
 import cheep.data.Post
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
-import japgolly.scalajs.react.extra.StateSnapshot
+
+import cats.effect.SyncIO
 import japgolly.scalajs.react.ReactMonocle._
-import monocle._
-import japgolly.scalajs.react.callback.Callback
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.StateSnapshot
+import japgolly.scalajs.react.vdom.html_<^._
+// import japgolly.scalajs.react.callback.Callback
 
 object PostEditor {
-  import Editable._
-
-  type Props = StateSnapshot[Editable[Post]]
-
-  val postLens: Lens[Editable[Post], Post] = Editable.lens(Post("", ""))
+  final case class Props(
+      currentPost: StateSnapshot[Post],
+      onPost: Post => SyncIO[Unit]
+  )
 
   final class Backend($ : BackendScope[Props, Unit]) {
-    val author: Lens[Editable[Post], String] = postLens.andThen(Post.author)
-    val text: Lens[Editable[Post], String] = postLens.andThen(Post.text)
-
     val authorSnapshot = StateSnapshot.withReuse
-      .zoomL(author)
-      .prepareViaProps($)((props: Props) => props)
+      .zoomL(Post.author)
+      .prepareViaProps($)(_.currentPost)
 
     val textSnapshot = StateSnapshot.withReuse
-      .zoomL(text)
-      .prepareViaProps($)((props: Props) => props)
+      .zoomL(Post.text)
+      .prepareViaProps($)(_.currentPost)
 
     def render(props: Props): VdomElement = {
       def postIsValid(post: Post): Boolean =
         post.author.nonEmpty && post.text.nonEmpty
 
-      def onSubmit: Callback =
-        Callback {
-          props.value match {
-            case Finished(post) => ()
-            case d @ Draft(post) =>
-              if (postIsValid(post)) props.setState(d.finish) else ()
-          }
-        }
+      val onSubmit: SyncIO[Unit] =
+        props.onPost(props.currentPost.value) >>
+          props.currentPost.setState(Post.empty)
 
       <.div(^.className := "py-4")(
         <.h3(^.className := "text-2xl font-extrabold pb-2")(
@@ -49,20 +40,24 @@ object PostEditor {
           StringEditor.Props(
             name = "author",
             label = "Author",
-            string = authorSnapshot(props.value)
+            string = authorSnapshot(props.currentPost.value)
           )
         ),
         TextAreaEditor.component(
           TextAreaEditor.Props(
             name = "content",
             label = "Post",
-            rows = 5,
-            cols = 80,
-            text = textSnapshot(props.value)
+            rows = None,
+            cols = None,
+            text = textSnapshot(props.currentPost.value)
           )
         ),
         SubmitButton.component(
-          SubmitButton.Props(label = "Post it!", active = false)
+          SubmitButton.Props(
+            label = "Post it!",
+            active = postIsValid(props.currentPost.value),
+            onClick = onSubmit
+          )
         )
       )
     }

@@ -2,7 +2,6 @@ package cheep
 
 import japgolly.scalajs.react.Reusability
 import monocle.Lens
-import cheep.Editable.Draft
 
 /** Represents a value that may be in the process of being edited. Can be in
   * two states:
@@ -61,7 +60,6 @@ object Editable {
 
   final case class Finished[A](value: A) extends Editable[A]
   final case class Draft[A](value: A) extends Editable[A] {
-    // Can't be called finishedize because that collides with JVM built-in
     def finish: Finished[A] = Finished(value)
   }
 
