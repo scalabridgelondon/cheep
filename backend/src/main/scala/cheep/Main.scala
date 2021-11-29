@@ -1,5 +1,6 @@
 package cheep
 
+import com.comcast.ip4s._
 import cats.effect._
 import cats.implicits._
 import fs2.Stream
@@ -12,24 +13,24 @@ import org.http4s.server.{Router, Server}
 /** This object setups and runs the webserver.
   */
 object Main extends IOApp {
-  private def app(blocker: Blocker): HttpApp[IO] = {
+  private def app(): HttpApp[IO] = {
     val services =
-      (CORS(CheepService.service) <+> AssetService.service(blocker))
+      (CORS(CheepService.service) <+> AssetService.service())
     Router("/" -> services).orNotFound
   }
 
-  private def server(blocker: Blocker): Resource[IO, Server] =
+  private def server(): Resource[IO, Server] =
     EmberServerBuilder
       .default[IO]
-      .withHost("0.0.0.0")
-      .withPort(3000)
-      .withHttpApp(app(blocker))
+      .withHost(host"0.0.0.0")
+      .withPort(port"3000")
+      .withHttpApp(app())
       .build
 
   private val program: Stream[IO, Unit] =
     for {
-      blocker <- Stream.resource(Blocker[IO])
-      server <- Stream.resource(server(blocker))
+      // blocker <- Stream.resource(Blocker[IO])
+      server <- Stream.resource(server())
       _ <- Stream.eval(IO(println(s"Started server on: ${server.address}")))
       _ <- Stream.never[IO].covaryOutput[Unit]
     } yield ()

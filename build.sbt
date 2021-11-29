@@ -1,17 +1,17 @@
 name := "cheep"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
-ThisBuild / scalaVersion := "2.13.5"
+ThisBuild / scalaVersion := "3.1.0"
 ThisBuild / useSuperShell := false
 
 // ScalaFix configuration
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+// ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
-val catsVersion = "2.4.2"
-val circeVersion = "0.13.0"
-val http4sVersion = "1.0.0-M6"
+val catsVersion = "2.6.1"
+val circeVersion = "0.14.1"
+val http4sVersion = "0.23.6"
 val logbackVersion = "1.2.3"
-val munitVersion = "0.7.22"
+val munitVersion = "1.0.0-M1"
 
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
@@ -21,14 +21,14 @@ val sharedSettings = Seq(
     "io.circe"      %%% "circe-parser"  % circeVersion,
     "org.scalameta" %%% "munit"         % munitVersion % Test
   ),
-  scalacOptions ++= Seq(
-    "-Yrangepos",
-    "-Ymacro-annotations",
-    "-Wunused:imports",
-    "-Werror"
-  ),
+  // scalacOptions ++= Seq(
+  //   "-Yrangepos",
+  //   "-Ymacro-annotations",
+  //   "-Wunused:imports",
+  //   "-Werror"
+  // ),
   testFrameworks += new TestFramework("munit.Framework"),
-  addCompilerPlugin(scalafixSemanticdb)
+  // addCompilerPlugin(scalafixSemanticdb)
 )
 
 val deploy = taskKey[Unit]("Deploy the frontend to the backend asset location")
@@ -39,7 +39,7 @@ lazy val data = crossProject(JSPlatform, JVMPlatform)
   .in(file("data"))
   .settings(
     sharedSettings,
-    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
+    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
   )
 
 lazy val backend = project
@@ -54,7 +54,7 @@ lazy val backend = project
       ),
     run / fork := true,
     run / javaOptions += s"-Dtodone.assets=${((baseDirectory.value) / "assets").toString}",
-    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
+    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value }
   )
   .dependsOn(data.jvm)
 
@@ -82,9 +82,9 @@ lazy val frontend = project
       "react-icons" -> "4.1.0"
     ),
     libraryDependencies ++= Seq(
-      "me.shadaj" %%% "slinky-web" % "0.6.7",
-      "me.shadaj" %%% "slinky-hot" % "0.6.7",
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+      "me.shadaj" %%% "slinky-web" % "0.6.8+6-998383e1",
+      "me.shadaj" %%% "slinky-hot" % "0.6.8+6-998383e1",
+      "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     ),
     webpack / version := "4.43.0",
     startWebpackDevServer / version := "3.11.0",
@@ -95,7 +95,7 @@ lazy val frontend = project
     fullOptJS / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-opt.config.js"),
     Test / webpackConfigFile := Some(baseDirectory.value / "webpack" / "webpack-core.config.js"),
     Test / requireJsDomEnv := true,
-    build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test, Compile / fullOptJS, deploy).value },
+    // build := { Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test, Compile / fullOptJS, deploy).value },
     deploy := {
       val fs = (Compile / fullOptJS / webpack).value
       val outDir = (backend / baseDirectory).value / "assets"
