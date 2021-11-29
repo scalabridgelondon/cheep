@@ -1,8 +1,8 @@
 package cheep
 
-import com.comcast.ip4s._
 import cats.effect._
 import cats.implicits._
+import com.comcast.ip4s._
 import fs2.Stream
 import org.http4s._
 import org.http4s.ember.server.EmberServerBuilder

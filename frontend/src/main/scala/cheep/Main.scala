@@ -1,11 +1,9 @@
 package cheep
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportTopLevel, JSImport}
-import scala.scalajs.{LinkingInfo, js}
 
 import org.scalajs.dom
-import slinky.hot
-import slinky.web.ReactDOM
 
 @JSImport("resources/index.css", JSImport.Default)
 @js.native
@@ -16,10 +14,6 @@ object Main {
 
   @JSExportTopLevel("main")
   def main(): Unit = {
-    if (LinkingInfo.developmentMode) {
-      hot.initialize()
-    }
-
     val container = Option(dom.document.getElementById("root")).getOrElse {
       val elem = dom.document.createElement("div")
       elem.id = "root"
@@ -27,6 +21,6 @@ object Main {
       elem
     }
 
-    ReactDOM.render(App(), container)
+    App.component().renderIntoDOM(container)
   }
 }
