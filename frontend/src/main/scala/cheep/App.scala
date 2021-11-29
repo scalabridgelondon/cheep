@@ -14,7 +14,8 @@ object App {
   final case class State(posts: Posts, newPost: Post)
   object State {
     import cheep.DataReusability._
-    implicit val stateReusability = Reusability.derive[State]
+    implicit val stateReusability: Reusability[State] =
+      Reusability.derive[State]
 
     val posts = Lens[State, Posts](_.posts)(ps => s => s.copy(posts = ps))
     val newPost =
