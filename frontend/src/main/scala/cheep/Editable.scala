@@ -3,11 +3,11 @@ package cheep
 import japgolly.scalajs.react.Reusability
 import monocle.Lens
 
-/** Represents a value that may be in the process of being edited. Can be in
-  * two states:
+/** Represents a value that may be in the process of being edited. Can be in two
+  * states:
   *
-  * - Draft: there is a value that the user is in the process of editing
-  * - Finished: the user has finishedized the value
+  *   - Draft: there is a value that the user is in the process of editing
+  *   - Finished: the user has finishedized the value
   */
 sealed trait Editable[+A] {
   import Editable._
