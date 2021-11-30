@@ -15,6 +15,7 @@ val logbackVersion = "1.2.3"
 val munitVersion = "1.0.0-M1"
 val scalajsReactVersion = "2.0.0"
 val monocleVersion = "3.1.0"
+val sttpVersion = "3.3.17"
 
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
@@ -91,6 +92,8 @@ lazy val frontend = project
       "com.github.japgolly.scalajs-react" %%% "core-bundle-cats_effect" % scalajsReactVersion,
       "com.github.japgolly.scalajs-react" %%% "extra" % scalajsReactVersion,
       "com.github.japgolly.scalajs-react" %%% "extra-ext-monocle3" % scalajsReactVersion,
+      "com.softwaremill.sttp.client3" %%% "cats" % sttpVersion,
+      "com.softwaremill.sttp.client3" %%% "circe" % sttpVersion,
       "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     ),
     webpack / version := "4.43.0",

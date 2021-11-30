@@ -2,7 +2,7 @@ package cheep.component
 
 import cheep.data.Post
 
-import cats.effect.SyncIO
+import cats.effect.IO
 import japgolly.scalajs.react.ReactMonocle._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.StateSnapshot
@@ -12,7 +12,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 object PostEditor {
   final case class Props(
       currentPost: StateSnapshot[Post],
-      onPost: Post => SyncIO[Unit]
+      onPost: Post => IO[Unit]
   )
 
   final class Backend($ : BackendScope[Props, Unit]) {
@@ -28,9 +28,9 @@ object PostEditor {
       def postIsValid(post: Post): Boolean =
         post.author.nonEmpty && post.text.nonEmpty
 
-      val onSubmit: SyncIO[Unit] =
+      val onSubmit: IO[Unit] =
         props.onPost(props.currentPost.value) >>
-          props.currentPost.setState(Post.empty)
+          props.currentPost.setState(Post.empty).to[IO]
 
       <.div(^.className := "py-4")(
         <.h3(^.className := "text-2xl font-extrabold pb-2")(

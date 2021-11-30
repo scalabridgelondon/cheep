@@ -1,9 +1,10 @@
 package cheep
 
+import cheep.api.Api
 import cheep.component._
 import cheep.data._
 
-import cats.effect.SyncIO
+import cats.effect.{IO, SyncIO}
 import japgolly.scalajs.react.ReactMonocle._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.StateSnapshot
@@ -11,6 +12,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 import monocle.Lens
 
 object App {
+  import japgolly.scalajs.react.util.EffectCatsEffect._
+
   final case class State(posts: Posts, newPost: Post)
   object State {
     import cheep.DataReusability._
@@ -23,6 +26,9 @@ object App {
   }
 
   final class Backend($ : BackendScope[Unit, State]) {
+    def fetchAndSetPosts(posts: StateSnapshot[Posts]): IO[Unit] =
+      Api.posts.flatMap(ps => posts.setState(ps).to[IO])
+
     def render(state: State): VdomElement = {
       val postsSnapshot: StateSnapshot[Posts] =
         StateSnapshot.zoomL(State.posts)(state).setStateVia($)
@@ -30,8 +36,8 @@ object App {
       val newPostSnapshot: StateSnapshot[Post] =
         StateSnapshot.zoomL(State.newPost)(state).setStateVia($)
 
-      def onPost(post: Post): SyncIO[Unit] = {
-        postsSnapshot.modState(_.add(post))
+      def onPost(post: Post): IO[Unit] = {
+        Api.create(post).flatMap(_ => fetchAndSetPosts(postsSnapshot))
       }
 
       println(s"State is $state")
@@ -73,34 +79,13 @@ object App {
     }
   }
   val component = ScalaComponent
-    .builder[Unit]
-    .initialState(
-      State(
-        Posts(
-          List(
-            Id(5) -> Post(
-              "Albert",
-              "In the midst of winter, I found there was, within me, an invincible summer."
-            ),
-            Id(4) -> Post("BizzBuzz", "When's lunch? I'm sooooo hungry"),
-            Id(3) -> Post(
-              "Archimedes",
-              "Give me a lever and a place to stand, and I will move the world!"
-            ),
-            Id(2) -> Post(
-              "Dreamer",
-              "The clouds are so beautiful today. It's a good day to be alive!"
-            ),
-            Id(1) -> Post("BizzBuzz", "Learning http4s today!"),
-            Id(0) -> Post(
-              "Ada",
-              "That brain of mine is something more than merely mortal, as time will show."
-            )
-          )
-        ),
-        Post.empty
+    .builder[Unit]("Cheep")
+    .initialState(State(Posts(List.empty), Post.empty))
+    .renderBackend[Backend]
+    .componentDidMount($ =>
+      $.backend.fetchAndSetPosts(
+        StateSnapshot.zoomL(State.posts)($.state).setStateVia($)
       )
     )
-    .renderBackend[Backend]
     .build
 }

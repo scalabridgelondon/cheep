@@ -15,7 +15,7 @@ import org.http4s.server.{Router, Server}
 object Main extends IOApp {
   private def app(): HttpApp[IO] = {
     val services =
-      (CORS(CheepService.service) <+> AssetService.service())
+      (CORS(CheepService(InMemoryModel).service) <+> AssetService.service())
     Router("/" -> services).orNotFound
   }
 

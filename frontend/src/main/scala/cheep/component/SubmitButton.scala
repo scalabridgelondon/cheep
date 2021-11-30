@@ -1,11 +1,11 @@
 package cheep.component
 
-import cats.effect.SyncIO
+import cats.effect.IO
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 object SubmitButton {
-  final case class Props(label: String, active: Boolean, onClick: SyncIO[Unit])
+  final case class Props(label: String, active: Boolean, onClick: IO[Unit])
 
   val component = ScalaComponent
     .builder[Props]
