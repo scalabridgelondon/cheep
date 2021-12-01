@@ -4,28 +4,20 @@ import cheep.data._
 
 import cats.effect.IO
 import io.circe.{Decoder, Json}
-import sttp.client3._
-import sttp.client3.circe._
+import org.http4s.circe.CirceEntityCodec._
+import org.http4s.client.dsl.io._
+import org.http4s.dom._
+import org.http4s.Method._
+import org.http4s.syntax.all._
 
 object Api {
-  val host = "http://localhost:3000"
+  val host = uri"http://localhost:3000"
 
-  val backend = sttp.client3.impl.cats.FetchCatsBackend[IO]()
+  val client = FetchClientBuilder[IO].create
 
-  def posts: IO[Posts] = {
-    val request =
-      basicRequest.get(uri"${host}/api/posts").response(asJson[Posts].getRight)
+  def posts: IO[Posts] = client.expect(host / "api" / "posts")
 
-    request.send(backend).map(response => response.body)
-  }
+  def create(post: Post): IO[Id] =
+    client.expect(POST(post, host / "api" / "posts"))
 
-  def create(post: Post): IO[Id] = {
-    val request =
-      basicRequest
-        .post(uri"${host}/api/post")
-        .body(post)
-        .response(asJson[Id].getRight)
-
-    request.send(backend).map(response => response.body)
-  }
 }
