@@ -1,15 +1,14 @@
 package cheep
 
-import munit.*
-
-import org.http4s.*
-import org.http4s.implicits.*
-import cats.effect.IO
-import cats.data.OptionT
-import munit.CatsEffectSuite
 import cheep.data.*
+
+import cats.data.OptionT
+import cats.effect.IO
+import munit.*
+import org.http4s.*
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.circe.*
+import org.http4s.implicits.*
 
 class CheepServiceSuite extends CatsEffectSuite {
 

@@ -1,6 +1,7 @@
 package cheep
 
 import cheep.data.*
+
 import munit.*
 
 class InMemoryModelSuite extends FunSuite {
