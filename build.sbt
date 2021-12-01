@@ -13,6 +13,7 @@ val circeVersion = "0.14.1"
 val http4sVersion = "0.23.6"
 val logbackVersion = "1.2.3"
 val munitVersion = "1.0.0-M1"
+val munitCatsVersion = "1.0.0"
 val scalajsReactVersion = "2.0.0"
 val monocleVersion = "3.1.0"
 val sttpVersion = "3.3.17"
@@ -24,7 +25,8 @@ val sharedSettings = Seq(
     "io.circe" %%% "circe-generic" % circeVersion,
     "io.circe" %%% "circe-parser" % circeVersion,
     "dev.optics" %%% "monocle-core" % monocleVersion,
-    "org.scalameta" %%% "munit" % munitVersion % Test
+    "org.scalameta" %%% "munit" % munitVersion % Test,
+    "org.typelevel" %%% "munit-cats-effect-3" % "1.0.6" % Test
   ),
   // scalacOptions ++= Seq(
   //   "-Yrangepos",
@@ -56,6 +58,7 @@ lazy val backend = project
       "org.http4s" %% "http4s-ember-server" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
       "org.http4s" %% "http4s-dsl" % http4sVersion,
+      "org.http4s" %% "http4s-client" % http4sVersion,
       "ch.qos.logback" % "logback-classic" % logbackVersion
     ),
     run / fork := true,
