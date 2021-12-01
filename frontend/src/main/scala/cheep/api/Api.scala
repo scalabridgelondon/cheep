@@ -4,10 +4,10 @@ import cheep.data._
 
 import cats.effect.IO
 import io.circe.{Decoder, Json}
+import org.http4s.Method._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.client.dsl.io._
 import org.http4s.dom._
-import org.http4s.Method._
 import org.http4s.syntax.all._
 
 object Api {
