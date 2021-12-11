@@ -100,9 +100,6 @@ lazy val frontend = project
       "org.http4s" %%% "http4s-circe" % http4sVersion,
       "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     ),
-    // TODO temporary workaround for https://github.com/scala-js/scala-js/issues/4601
-    Compile / fullOptJS / scalaJSLinkerConfig ~= { _.withCheckIR(false) },
-    Test / fullOptJS / scalaJSLinkerConfig ~= { _.withCheckIR(false) },
     webpack / version := "4.43.0",
     startWebpackDevServer / version := "3.11.0",
     webpackResources := baseDirectory.value / "webpack" * "*",
