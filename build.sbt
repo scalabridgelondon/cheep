@@ -62,7 +62,7 @@ lazy val backend = project
       "ch.qos.logback" % "logback-classic" % logbackVersion
     ),
     run / fork := true,
-    run / javaOptions += s"-Dtodone.assets=${((baseDirectory.value) / "assets").toString}",
+    run / javaOptions += s"-Dcheep.assets=${((baseDirectory.value) / "assets").toString}",
     build := {
       Def.sequential(scalafixAll.toTask(""), scalafmtAll, Test / test).value
     }
